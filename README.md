@@ -3,4 +3,3 @@
 Tutorial: https://gamedev.land/pixi_project_template/
 
 
-# Infinite

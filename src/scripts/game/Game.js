@@ -4,6 +4,7 @@ import { Hero } from "./Hero";
 import { Platforms } from "./Platforms";
 import { App } from "../system/App";
 import * as Matter from "matter-js";
+import { LabelScore } from "./LabelScore";
 
 export class Game extends Scene {
     create() {
@@ -11,6 +12,26 @@ export class Game extends Scene {
         this.createPlatforms();
         this.createHero();
         this.setEvents();
+        this.createUI();
+    }
+
+    destroy() {
+        Matter.Events.off(App.physics, "collisionStart", this.onCollisionStart.bind(this));
+        App.app.ticker.remove(this.update, this);
+
+        this.bg.destroy();
+        this.hero.destroy();
+        this.platforms.destroy();
+        this.labelScore.destroy();
+    }
+
+    createUI() {
+        this.labelScore = new LabelScore();
+        this.container.addChild(this.labelScore);
+
+        this.hero.sprite.on("score", () => {
+            this.labelScore.renderScore(this.hero.score);
+        });
     }
 
     setEvents() {
@@ -44,6 +65,10 @@ export class Game extends Scene {
         this.container.interactive = true;
         this.container.on("pointerdown", () => {
             this.hero.startJump();
+        });
+
+        this.hero.sprite.once("die", () => {
+            App.scenes.start("Game");
         });
     }
 
